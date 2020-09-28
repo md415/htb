@@ -1,10 +1,11 @@
 # Legacy 
 
-![Legacy](profile.JPG)
+Legacy | OS  | Difficulty |
+| --- | --- | --- |
+| ![Legacy](profile.JPG) | Windows | Easy |
 
-| OS  | Difficulty |
-| --- | --- |
-| Windows | Easy |
+
+
 
 ## Summary
 
@@ -12,11 +13,17 @@
 * Quick internet search shows the history with Shadow Brokers related exploits (i.e. EternalBlue, EclipsedWing)
 * Multiple Python scripts are available to send a payload and get the reverse shell
 
+
+
+
 ## Tools needed
 
 * Python w/ Impacket and PyCrypto modules
 * msfvenom
 * nc
+
+
+
 
 ## Detection 
 
@@ -98,9 +105,12 @@ Microsoft Windows Server 2000/2003 - Code Execution (MS08-067)                  
 ------------------------------------------------------------------------------------------------------------------------------------------------------------ ---------------------------------
 ```
 
-## Exploitation
 
-Multiple RCE's available.  Let's try the first Python one, windows/remote/40279.py
+
+
+## Exploit attempt #1
+
+Multiple RCE's available.  Let's try the first Python one, `windows/remote/40279.py`
 
 ```
 # searchsploit -m 40279
@@ -112,10 +122,12 @@ File Type: Python script, ASCII text executable, with very long lines, with CRLF
 Copied to: /root/htb/legacy/40279.py
 ```
 
-Executing python 40279.py shows some missing depedencies of Impacket and PyCrypto.  Install with Pip.
+Executing `python 40279.py` shows some missing depedencies of Impacket and PyCrypto.  Install with Pip.
 
-pip install Impacket
-pip install PyCrypto
+```
+# pip install Impacket
+# pip install PyCrypto
+```
 
 Checking the file, we need to generate our unique payload.  
 
@@ -203,7 +215,12 @@ No exact match, but the aggressive guesses at 92% are either
 - Microsoft Windows XP SP2 or Windows Small Business Server 2003
 - Microsoft Windows 2000 SP4 or Windows XP SP2 or SP3
 
-SP2 isn't listed as an opton.  Tried options 6 and 7 for SP3, but no luck.
+SP2 isn't listed as an opton.  Tried options 6 and 7 for SP3, but no luck.  I'm getting nowhere.
+
+
+
+
+## Exploit attempt #2
 
 Scrapping this script, I hit Google: "MS08-67 Python SP2 SP3"
 
