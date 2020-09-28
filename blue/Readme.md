@@ -1,8 +1,6 @@
 # Blue 
 
-| | OS  | Difficulty |
-| --- | --- | --- |
-| ![Blue](profile.JPG) | Windows | Easy |
+![Blue](./profile.JPG)
 
 
 ## Summary
@@ -219,7 +217,7 @@ done
 
 Setting up two listeners for x64 and x86, I get a hit for x64:
 
-![42031.py](blue_42031.JPG)
+![42031.py](./blue_42031.JPG)
 
 
 Check for users
