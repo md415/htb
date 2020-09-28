@@ -1,6 +1,6 @@
 # Legacy 
 
-Legacy | OS  | Difficulty |
+| | OS  | Difficulty |
 | --- | --- | --- |
 | ![Legacy](profile.JPG) | Windows | Easy |
 
