@@ -1,6 +1,6 @@
 # Legacy 
 
-![Legacy](./profile.JPG)
+<img src="profile.JPG" />
 
 
 ## Summary
