@@ -1,8 +1,9 @@
 # Legacy 
 
-![Legacy](profile.jpg)
+![Legacy](profile.JPG)
 
-| OS | Difficulty |
+| OS  | Difficulty |
+| --- | --- |
 | Windows | Easy |
 
 ## Summary
@@ -17,7 +18,9 @@
 * msfvenom
 * nc
 
-## Detection
+## Detection 
+
+Start with nmap as usual.  Trying the `--script *vuln*` option to list common vulnerabilities.
 
 ```
 # nmap -sV --script *vuln* -oA nmap 10.10.10.4                                                                                                                                   [166/186]
