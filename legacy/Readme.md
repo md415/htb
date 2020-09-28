@@ -1,6 +1,6 @@
 # Legacy 
 
-<img src="https://raw.githubusercontent.com/md415/htb/master/legacy/profile.JPG" />
+![Legacy](./profile.JPG)
 
 
 ## Summary
