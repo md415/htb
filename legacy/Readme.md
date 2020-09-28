@@ -20,6 +20,7 @@
 
 * Python w/ Impacket and PyCrypto modules
 * msfvenom
+* searchsploit
 * nc
 
 
