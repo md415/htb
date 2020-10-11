@@ -54,7 +54,7 @@ OS and Service detection performed. Please report any incorrect results at https
 Nmap done: 1 IP address (1 host up) scanned in 20.34 seconds
 ```
 
-OS best guess is `Microsoft Windows 2012|Vista|2008|7 (90%)`.  Open port is 80 and it's an HTTP File Server, or specifically `HFS 2.3`.  Let's start at the port.
+OS best guess is `Microsoft Windows 2012|Vista|2008|7`.  Open port is 80 and it's an HTTP File Server.  Let's start at the port.
 
 ```
 curl -I 10.10.10.8:80
@@ -99,7 +99,7 @@ File Type: Python script, ASCII text executable, with very long lines, with CRLF
 
 Copied to: /root/htb/optimum/39161.py
 ```
-Checking the code, we need to get nc.exe ready for upload to the target server and the author expects it to be locally hosted, specifically http://&lt;local IP&rt;:80/nc.exe.
+Checking the code, we need to get nc.exe ready for upload to the target server and the author expects it to be locally hosted, specifically http://&lt;local IP&gt;:80/nc.exe.
 
 ```
 #find / | grep -i nc.exe
