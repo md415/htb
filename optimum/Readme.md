@@ -99,7 +99,7 @@ File Type: Python script, ASCII text executable, with very long lines, with CRLF
 
 Copied to: /root/htb/optimum/39161.py
 ```
-Checking the code, we need to get a Windows Netcat .exe ready for upload to the target server and the author expects it to be locally hosted, specifically http://<local IP>:80/nc.exe.
+Checking the code, we need to get nc.exe ready for upload to the target server and the author expects it to be locally hosted, specifically http://&lt;local IP&rt;:80/nc.exe.
 
 ```
 #find / | grep -i nc.exe
